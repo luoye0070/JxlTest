@@ -47,7 +47,10 @@ public class JxlTest {
             foutChannel.close();
 
             System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").importData("当年当日签单保费.txt","当日签单",1,0,null));
-
+            System.out.println("dddd"+new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").evaluateAllFormulaCells());
+            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").cleanNullValue("当日签单",1,11,3265,11));
+            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").evaluateAllFormulaCells());
+//            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").cleanNullValue("当日签单",95,11,96,11));
 //            Workbook workbook=new HSSFWorkbook(new FileInputStream("日报基础2015..xls"));
 //            Sheet sheet= workbook.getSheet("当日签单");
 //            Row row=sheet.getRow(95);

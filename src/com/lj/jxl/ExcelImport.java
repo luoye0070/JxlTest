@@ -1,6 +1,7 @@
 package com.lj.jxl;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 
@@ -95,6 +96,7 @@ public class ExcelImport {
                 rowIndex++;
             }
             sheet.setForceFormulaRecalculation(true);
+            //HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
             workbook.write(new FileOutputStream(excelFile));
         }catch (Exception ex){
             ex.printStackTrace();
@@ -105,7 +107,7 @@ public class ExcelImport {
                     bufferedReader.close();
                 }
                 if(workbook!=null){
-                    workbook.close();;
+                    workbook.close();
                 }
             }catch (Exception ex){
                ex.printStackTrace();
@@ -115,5 +117,98 @@ public class ExcelImport {
         return result;
     }
 
+    public int cleanNullValue(String sheetName,int beginRow,int beginCell,int endRow,int endCell){
+        int result=0;
+        File excelFile=new File(excelFilePath);
+        if(!excelFile.exists()){
+            return -1;//excel文件不存在
+        }
+        if(charsetName==null||charsetName.equals("")){
+            charsetName="gb2312";
+        }
+        Workbook workbook=null;
+        try{
+            workbook=new HSSFWorkbook(new FileInputStream(excelFilePath));
+            Sheet sheet= workbook.getSheet(sheetName);
+            if(sheet==null){
+                return -3;
+            }
+            int rowIndex=beginRow;
+            while (rowIndex<=endRow){
+                //将数据写入excel
+                Row row=sheet.getRow(rowIndex);
+                if(row==null){
+                    continue;
+                }
+                for(int i=beginCell;i<=endCell;i++){
+                    int cellIndex=beginCell;
+                    Cell cell=row.getCell(cellIndex);
+                    if(cell==null){
+                        continue;
+                    }
 
+                    System.out.println(rowIndex+"*"+cellIndex);
+                    if(cell.getCellType()==Cell.CELL_TYPE_FORMULA){
+                        System.out.println("is Foumula");
+                        try{
+                            double value=cell.getNumericCellValue();
+                            System.out.println("value is "+value);
+                        }catch (IllegalStateException ex){
+                            cell=row.createCell(cellIndex);
+                            cell.setCellValue(0);
+                            cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
+                            System.out.println("set 0");
+                        }
+                    }else{
+                        System.out.println("is not Formula");
+                    }
+//                    cell.setCellValue(cellStrs[i]);
+//                    cell.setCellType(HSSFCell.ENCODING_UNCHANGED);
+                }
+                rowIndex++;
+            }
+            sheet.setForceFormulaRecalculation(true);
+            //HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+            workbook.write(new FileOutputStream(excelFile));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return -100;
+        }finally {
+            try {
+                if(workbook!=null){
+                    workbook.close();
+                }
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+
+        return result;
+    }
+    public int evaluateAllFormulaCells(){
+        int result=0;
+        File excelFile=new File(excelFilePath);
+        if(!excelFile.exists()){
+            return -1;//excel文件不存在
+        }
+        Workbook workbook=null;
+        try{
+            workbook=new HSSFWorkbook(new FileInputStream(excelFilePath));
+            HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+            workbook.write(new FileOutputStream(excelFile));
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return -100;
+        }finally {
+            try {
+                if(workbook!=null){
+                    workbook.close();
+                }
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+        }
+
+        return result;
+    }
 }
