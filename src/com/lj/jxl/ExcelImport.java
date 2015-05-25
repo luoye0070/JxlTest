@@ -18,13 +18,29 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class ExcelImport {
-    String excelFilePath=null;
-    String charsetName=null;
-    String dateFormtStr=null;
+    public String[] workbookNames=null;
+    public String excelFilePath=null;
+    public String charsetName=null;
+    public String dateFormtStr=null;
     public ExcelImport(String excelFilePath,String charsetName,String dateFormtStr){
         this.excelFilePath=excelFilePath;
         this.charsetName=charsetName;
         this.dateFormtStr=dateFormtStr;
+    }
+    public ExcelImport(String excelFilePath,String charsetName,String dateFormtStr,String[] workbookNames){
+        this.excelFilePath=excelFilePath;
+        this.charsetName=charsetName;
+        this.dateFormtStr=dateFormtStr;
+        this.workbookNames=workbookNames;
+    }
+    public ExcelImport(String excelFilePath){
+        this.excelFilePath=excelFilePath;
+    }
+    public ExcelImport(String excelFilePath,String[] workbookNames){
+        this.excelFilePath=excelFilePath;
+        this.workbookNames=workbookNames;
+    }
+    public ExcelImport(){
     }
 
     public int importData(String txtFilePath,String sheetName,int beginRow,int beginCell,String decollator){
@@ -95,7 +111,7 @@ public class ExcelImport {
                 System.out.println("");
                 rowIndex++;
             }
-            sheet.setForceFormulaRecalculation(true);
+            //sheet.setForceFormulaRecalculation(true);
             //HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
             workbook.write(new FileOutputStream(excelFile));
         }catch (Exception ex){
@@ -126,9 +142,10 @@ public class ExcelImport {
         if(charsetName==null||charsetName.equals("")){
             charsetName="gb2312";
         }
-        Workbook workbook=null;
+        HSSFWorkbook workbook=null;
         try{
             workbook=new HSSFWorkbook(new FileInputStream(excelFilePath));
+            HSSFFormulaEvaluator evaluator=new HSSFFormulaEvaluator(workbook);
             Sheet sheet= workbook.getSheet(sheetName);
             if(sheet==null){
                 return -3;
@@ -150,6 +167,7 @@ public class ExcelImport {
                     System.out.println(rowIndex+"*"+cellIndex);
                     if(cell.getCellType()==Cell.CELL_TYPE_FORMULA){
                         System.out.println("is Foumula");
+                        evaluator.evaluateInCell(cell);
                         try{
                             double value=cell.getNumericCellValue();
                             System.out.println("value is "+value);
@@ -167,7 +185,7 @@ public class ExcelImport {
                 }
                 rowIndex++;
             }
-            sheet.setForceFormulaRecalculation(true);
+            //sheet.setForceFormulaRecalculation(true);
             //HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
             workbook.write(new FileOutputStream(excelFile));
         }catch (Exception ex){
@@ -191,10 +209,15 @@ public class ExcelImport {
         if(!excelFile.exists()){
             return -1;//excel文件不存在
         }
-        Workbook workbook=null;
+        HSSFWorkbook workbook=null;
         try{
             workbook=new HSSFWorkbook(new FileInputStream(excelFilePath));
-            HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+            HSSFFormulaEvaluator hssfFormulaEvaluator=new HSSFFormulaEvaluator(workbook);
+            if(workbookNames!=null){
+               HSSFFormulaEvaluator.setupEnvironment(workbookNames,new HSSFFormulaEvaluator[]{hssfFormulaEvaluator});
+            }
+            hssfFormulaEvaluator.evaluateAll();
+            //HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
             workbook.write(new FileOutputStream(excelFile));
         }catch (Exception ex){
             ex.printStackTrace();

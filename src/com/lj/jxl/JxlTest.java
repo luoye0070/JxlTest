@@ -33,23 +33,23 @@ public class JxlTest {
 //            writableWorkbook.close();
 
 
-            File file=new File("日报基础2015..xls");
-            File file1=new File("日报基础2015_d..xls");
-            FileOutputStream fileOutputStream=new FileOutputStream(file1);
-            FileChannel foutChannel=fileOutputStream.getChannel();
-            FileInputStream fileInputStream=new FileInputStream(file);
-            FileChannel finChannel=fileInputStream.getChannel();
-
-            finChannel.transferTo(0,finChannel.size(),foutChannel);
-            fileInputStream.close();
-            finChannel.close();
-            fileOutputStream.close();;
-            foutChannel.close();
-
-            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").importData("当年当日签单保费.txt","当日签单",1,0,null));
-            System.out.println("dddd"+new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").evaluateAllFormulaCells());
-            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").cleanNullValue("当日签单",1,11,3265,11));
-            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").evaluateAllFormulaCells());
+//            File file=new File("日报基础2015..xls");
+//            File file1=new File("日报基础2015_d..xls");
+//            FileOutputStream fileOutputStream=new FileOutputStream(file1);
+//            FileChannel foutChannel=fileOutputStream.getChannel();
+//            FileInputStream fileInputStream=new FileInputStream(file);
+//            FileChannel finChannel=fileInputStream.getChannel();
+//
+//            finChannel.transferTo(0,finChannel.size(),foutChannel);
+//            fileInputStream.close();
+//            finChannel.close();
+//            fileOutputStream.close();;
+//            foutChannel.close();
+//
+//            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").importData("当年当日签单保费.txt","当日签单",1,0,null));
+//            //System.out.println("dddd"+new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").evaluateAllFormulaCells());
+//            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").cleanNullValue("当日签单",1,11,3265,11));
+//            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").evaluateAllFormulaCells());
 //            System.out.println(new ExcelImport("日报基础2015_d..xls",null,"yyyy-MM-dd").cleanNullValue("当日签单",95,11,96,11));
 //            Workbook workbook=new HSSFWorkbook(new FileInputStream("日报基础2015..xls"));
 //            Sheet sheet= workbook.getSheet("当日签单");
@@ -68,6 +68,11 @@ public class JxlTest {
 //
 //            workbook.write(new FileOutputStream("ddd.xls"));
 //            workbook.close();
+            ExcelImport excelImport=new ExcelImport("业务动态2015.5.14.xls");
+            excelImport.workbookNames=new String[]{"日报基础2015..xls"};
+            System.out.println(excelImport.evaluateAllFormulaCells());
+//            FileScanAndImport fileScanAndImport=new FileScanAndImport("","template","target");
+//            System.out.println(fileScanAndImport.scanAndImport());
         }catch (Exception ex){
             ex.printStackTrace();
         }
