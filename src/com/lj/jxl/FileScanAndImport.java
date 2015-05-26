@@ -5,10 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -85,12 +82,27 @@ public class FileScanAndImport {
             targetFilesDir.mkdirs();
         }
 
+        String fileGeneral=templateFileGeneral;
+        try{
+            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyyMMdd");
+            Date date=simpleDateFormat.parse(filesPath);
+            Calendar calendar=Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DATE,-1);
+            Date newDate=calendar.getTime();
+            String dateStr=simpleDateFormat.format(newDate);
+            int idx=templateFileGeneral.lastIndexOf(".");
+            String pre=templateFileGeneral.substring(0,idx);
+            String next=templateFileGeneral.substring(idx,templateFileGeneral.length());
+            fileGeneral=pre+dateStr+next;
+        }catch (Exception ex){}
+
         //拷贝模版文件到目标目录
         if(!copyFile(templateFilesPath+"/"+templateFileDetail,targetFilesPath+"/"+templateFileDetail)){
             System.out.println("4");
             return false;
         }
-        if(!copyFile(templateFilesPath+"/"+templateFileGeneral,targetFilesPath+"/"+templateFileGeneral)){
+        if(!copyFile(templateFilesPath+"/"+templateFileGeneral,targetFilesPath+"/"+fileGeneral)){
             System.out.println("5");
             return false;
         }
@@ -108,7 +120,8 @@ public class FileScanAndImport {
         excelImport.evaluateAllFormulaCells();
 
         //计算公式
-        ExcelImport excelImportGeneral=new ExcelImport(targetFilesPath+"/"+templateFileGeneral);
+        ExcelImport excelImportGeneral=new ExcelImport(targetFilesPath+"/"+fileGeneral);
+        excelImportGeneral.workbookFullNames=new String[]{targetFilesPath+"/"+templateFileDetail};
         excelImportGeneral.evaluateAllFormulaCells();
         System.out.println("6");
         return result;

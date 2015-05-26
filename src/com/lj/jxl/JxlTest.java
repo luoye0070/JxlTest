@@ -68,11 +68,12 @@ public class JxlTest {
 //
 //            workbook.write(new FileOutputStream("ddd.xls"));
 //            workbook.close();
-            ExcelImport excelImport=new ExcelImport("业务动态2015.5.14.xls");
-            excelImport.workbookNames=new String[]{"日报基础2015..xls"};
-            System.out.println(excelImport.evaluateAllFormulaCells());
-//            FileScanAndImport fileScanAndImport=new FileScanAndImport("","template","target");
-//            System.out.println(fileScanAndImport.scanAndImport());
+//            ExcelImport excelImport=new ExcelImport("业务动态2015.5.14.xls");
+//            excelImport.workbookFullNames=new String[]{"D:\\dp\\javaTest\\JxlTest/日报基础2015..xls"};
+//            System.out.println(excelImport.evaluateAllFormulaCells());
+            FileScanAndImport fileScanAndImport=new FileScanAndImport("","template","target");
+            fileScanAndImport.filesPath="20150525";
+            System.out.println(fileScanAndImport.scanAndImport());
         }catch (Exception ex){
             ex.printStackTrace();
         }

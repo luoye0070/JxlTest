@@ -18,7 +18,7 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class ExcelImport {
-    public String[] workbookNames=null;
+    public String[] workbookFullNames=null;
     public String excelFilePath=null;
     public String charsetName=null;
     public String dateFormtStr=null;
@@ -27,18 +27,18 @@ public class ExcelImport {
         this.charsetName=charsetName;
         this.dateFormtStr=dateFormtStr;
     }
-    public ExcelImport(String excelFilePath,String charsetName,String dateFormtStr,String[] workbookNames){
+    public ExcelImport(String excelFilePath,String charsetName,String dateFormtStr,String[] workbookFullNames){
         this.excelFilePath=excelFilePath;
         this.charsetName=charsetName;
         this.dateFormtStr=dateFormtStr;
-        this.workbookNames=workbookNames;
+        this.workbookFullNames=workbookFullNames;
     }
     public ExcelImport(String excelFilePath){
         this.excelFilePath=excelFilePath;
     }
-    public ExcelImport(String excelFilePath,String[] workbookNames){
+    public ExcelImport(String excelFilePath,String[] workbookFullNames){
         this.excelFilePath=excelFilePath;
-        this.workbookNames=workbookNames;
+        this.workbookFullNames=workbookFullNames;
     }
     public ExcelImport(){
     }
@@ -213,9 +213,20 @@ public class ExcelImport {
         try{
             workbook=new HSSFWorkbook(new FileInputStream(excelFilePath));
             HSSFFormulaEvaluator hssfFormulaEvaluator=new HSSFFormulaEvaluator(workbook);
-            if(workbookNames!=null){
-               HSSFFormulaEvaluator.setupEnvironment(workbookNames,new HSSFFormulaEvaluator[]{hssfFormulaEvaluator});
+            if(workbookFullNames!=null&&workbookFullNames.length>0){
+                int length=workbookFullNames.length;
+                String [] workbookNames=new String[length+1];
+                workbookNames[0]=getFileName(excelFilePath);
+                HSSFFormulaEvaluator[] hssfFormulaEvaluators=new HSSFFormulaEvaluator[length+1];
+                hssfFormulaEvaluators[0]=hssfFormulaEvaluator;
+                for(int i=0;i<length;i++){
+                    workbookNames[i+1]=getFileName(workbookFullNames[i]);
+                    hssfFormulaEvaluators[i+1]=new HSSFFormulaEvaluator(new HSSFWorkbook(new FileInputStream(workbookFullNames[i])));
+                }
+               HSSFFormulaEvaluator.setupEnvironment(workbookNames,hssfFormulaEvaluators);
             }
+            hssfFormulaEvaluator.setIgnoreMissingWorkbooks(true);
+            //hssfFormulaEvaluator.clearAllCachedResultValues();
             hssfFormulaEvaluator.evaluateAll();
             //HSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
             workbook.write(new FileOutputStream(excelFile));
@@ -233,5 +244,17 @@ public class ExcelImport {
         }
 
         return result;
+    }
+    private String getFileName(String fileFullName){
+        if(fileFullName==null){
+            return null;
+        }
+        int idx=fileFullName.lastIndexOf("/");
+        if(idx==-1){
+            return fileFullName;
+        }
+        String fileName=fileFullName.substring(idx+1,fileFullName.length());
+        System.out.println("fileName->"+fileName);
+        return fileName;
     }
 }
